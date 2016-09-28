@@ -35,3 +35,7 @@ which, if you have a DNS redirection/hosts file redirect/some other way to turn 
 
 That's really all I have to say. Feel free to report bugs, ask me questions, fork this project, make pull requests, whatever. I don't guarantee a response. :P
 
+What do I need to use DownTube?
+-------------------------------
+
+You need a webserver (Apache2 required to use the .htaccess file with the URL rewrites, otherwise any that can interface with PHP), PHP5, youtube-dl, and ffmpeg. That's all.
