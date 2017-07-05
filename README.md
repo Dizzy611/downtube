@@ -15,7 +15,7 @@ Without the htaccess file, it can be used like such:
 (I'm using a hootie and the blowfish video here for demonstration because I really like this song...)
 
 given the youtube url:
-http://www.youtube.com/watch?video=1aVHLL5egRY
+http://www.youtube.com/watch?v=1aVHLL5egRY
 
 http://yourwebserverhere/downtube.php?id=1aVHLL5egRY
 
