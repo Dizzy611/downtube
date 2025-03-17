@@ -15,6 +15,10 @@
 // Parameters! Modify these to your liking.
 
 // Defaults here were selected due to my intended use case and personal experience streaming over wireless.
+// ffmpeg binary, either just the binary name itself (if it's on path) or a full path to the binary. suggested values are "ffmpeg" "avconv" "/usr/bin/ffmpeg", etc.
+$ffmpeg_binary = "ffmpeg";
+// youtube downloader binary, similar to above. suggested values are "yt-dlp", "youtube-dl", "/usr/bin/yt-dlp", etc.
+$ytdl_binary = "yt-dlp";
 // Source format identifier (in youtube-dl format, see their documentation. I recommend "best" unless bandwidth prevents.
 $ytdl_format = "best";
 // Target video bitrate (in ffmpeg format, M for megabit, k for kilobit, no suffix for bits)
@@ -99,8 +103,8 @@ if (!$valid) {
 }
 
 header('Content-Type: video/mpeg');
-$ytdlline = "youtube-dl -4 -f " . $ytdl_format . " " . $escaped_youtube_id . " -o -";
-$ffmpegline = "ffmpeg -i - -vf scale=" . $width . ":" . $height . " -vcodec " . $codec . " -acodec " . $acodec . " -b:v " . $bitrate . " -b:a " . $abitrate . " -muxrate " . $bitrate . " -f " . $container . " - ";
+$ytdlline = $ytdl_binary . " -4 -f " . $ytdl_format . " " . $escaped_youtube_id . " -o -";
+$ffmpegline = $ffmpeg_binary . " -i - -vf scale=" . $width . ":" . $height . " -vcodec " . $codec . " -acodec " . $acodec . " -b:v " . $bitrate . " -b:a " . $abitrate . " -muxrate " . $bitrate . " -f " . $container . " - ";
 passthru($ytdlline . " | " . $ffmpegline);
 
 ?>
