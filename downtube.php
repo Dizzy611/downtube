@@ -38,6 +38,8 @@ $container = "mpegts";
 // Do "redirect hack" to enable using as a direct substitute for YouTube via
 // DNS redirection/URL rewrite. (see accompanying htaccess file for rewrite rule)
 $redirecthack = True;
+// Whether or not to output yt-dlp and ffmpeg "STDERR" (status messages) to a file in order to facilitate debugging.
+$debugmode = False;
 
 // End parameters
 
@@ -105,6 +107,10 @@ if (!$valid) {
 header('Content-Type: video/mpeg');
 $ytdlline = $ytdl_binary . " -4 -f " . $ytdl_format . " " . $escaped_youtube_id . " -o -";
 $ffmpegline = $ffmpeg_binary . " -i - -vf scale=" . $width . ":" . $height . " -vcodec " . $codec . " -acodec " . $acodec . " -b:v " . $bitrate . " -b:a " . $abitrate . " -muxrate " . $bitrate . " -f " . $container . " - ";
-passthru($ytdlline . " | " . $ffmpegline);
+if ($debugmode == True) {
+	passthru($ytdlline . " 2>>ytdl.log | " . $ffmpegline . " 2>>ffmpeg.log ");
+} else {
+	passthru($ytdlline . " | " . $ffmpegline);
+}
 
 ?>
