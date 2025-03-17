@@ -23,8 +23,10 @@ $ytdl_binary = "yt-dlp";
 $ytdl_format = "best";
 // Target video bitrate (in ffmpeg format, M for megabit, k for kilobit, no suffix for bits)
 $bitrate = "15M";
-// Target audio bitrate
+// Target audio bitrate for video
 $abitrate = "192k";
+// Target audio bitrate for audio only mode (set to "" if same as abitrate)
+$abitrate_only = "";
 // Target width (in ffmpeg format, -1 for 'keep aspect ratio')
 $width = "-1";
 // Target height (in ffmpeg format, -1 for 'keep aspect ratio'). The default here resizes the video to 480 height, keeping the width in proportion.
@@ -33,8 +35,17 @@ $height = "480";
 $codec = "mpeg2video";
 // Target audio codec (I suggest mp2 if using mpeg2video and mpegts container.)
 $acodec = "mp2";
-// Target container (mpegts works well for streaming!)
+// Target audio codec for audio only mode (set to "" if same as acodec)
+$acodec_only = "mp3";
+// Target video container (mpegts works well for streaming!).
 $container = "mpegts";
+// Target audio container for audio only mode (mp3 suggested for compatibility.)
+$audio_container = "mp3";
+// MIME type for video. Set to "video/mpeg" for MPEGTS containers.
+$video_mime = "video/mpeg";
+// MIME type for audio. Set to "audio/mpeg" for MP3.
+$audio_mime = "audio/mpeg";
+
 // Do "redirect hack" to enable using as a direct substitute for YouTube via
 // DNS redirection/URL rewrite. (see accompanying htaccess file for rewrite rule)
 $redirecthack = True;
@@ -91,6 +102,15 @@ if ($redirecthack == True) {
 	$youtube_id = $_GET['id'];
 }
 
+// Set a variable to detect if we're in video mode (default) or audio only mode.
+if (isset($_GET['aonly'])) {
+	if ($_GET['aonly'] == "yes") {
+		$audio_mode = True;
+	} else {
+		$audio_mode = False;
+	}
+}
+
 $escaped_youtube_id = escapeshellarg($youtube_id);
 
 $valid = False;
@@ -104,9 +124,25 @@ if (!$valid) {
 	doError("Failed validation: ID " . $youtube_id . " format valid, but does not appear to exist on YouTube.");
 }
 
-header('Content-Type: video/mpeg');
-$ytdlline = $ytdl_binary . " -4 -f " . $ytdl_format . " " . $escaped_youtube_id . " -o -";
-$ffmpegline = $ffmpeg_binary . " -i - -vf scale=" . $width . ":" . $height . " -vcodec " . $codec . " -acodec " . $acodec . " -b:v " . $bitrate . " -b:a " . $abitrate . " -muxrate " . $bitrate . " -f " . $container . " - ";
+if ($acodec_only == "") {
+	$acodec_only = $acodec;
+}
+
+if ($abitrate_only == "") {
+	$abitrate_only = $abitrate;
+}
+
+// Check the mode flag, and output video or audio as requested.
+if ($audio_mode == True) {
+	header('Content-Type: ' . $audio_mime);
+	$ytdlline = $ytdl_binary . " -4 -f " . $ytdl_format . " " . $escaped_youtube_id . " -o -";
+	$ffmpegline = $ffmpeg_binary . " -i - -vn -acodec " . $acodec_only . " -b:a " . $abitrate_only . " -f " . $audio_container . " - ";
+} else {
+	header('Content-Type: ' . $video_mime);
+	$ytdlline = $ytdl_binary . " -4 -f " . $ytdl_format . " " . $escaped_youtube_id . " -o -";
+	$ffmpegline = $ffmpeg_binary . " -i - -vf scale=" . $width . ":" . $height . " -vcodec " . $codec . " -acodec " . $acodec . " -b:v " . $bitrate . " -b:a " . $abitrate . " -muxrate " . $bitrate . " -f " . $container . " - ";
+}
+
 if ($debugmode == True) {
 	passthru($ytdlline . " 2>>ytdl.log | " . $ffmpegline . " 2>>ffmpeg.log ");
 } else {
