@@ -113,23 +113,25 @@ if (isset($_GET['aonly'])) {
 
 $escaped_youtube_id = escapeshellarg($youtube_id);
 
-$valid = False;
-
-$valid = validId($youtube_id);
-if (!$valid) {
-	doError("Failed pre-validation: ID " . $youtube_id . " does not appear to be a valid youtube video ID.");
-}
-$valid = videoExists($youtube_id);
-if (!$valid) {
-	doError("Failed validation: ID " . $youtube_id . " format valid, but does not appear to exist on YouTube.");
-}
-
 // Prototype playlist code, does not currently validate playlist exists
 if (isset($_GET['list']) {
 	$playlist_mode = True;
 	$list = escapeshellargs($_GET['list']);
 } else {
 	$playlist_mode = False;
+}
+
+if ($playlist_mode == False) { // Only check validity of id if not in playlist mode. id currently ignored in playlist mode (will play entire playlist from beginning)
+	$valid = False;
+
+	$valid = validId($youtube_id);
+	if (!$valid) {
+		doError("Failed pre-validation: ID " . $youtube_id . " does not appear to be a valid youtube video ID.");
+	}
+	$valid = videoExists($youtube_id);
+	if (!$valid) {
+		doError("Failed validation: ID " . $youtube_id . " format valid, but does not appear to exist on YouTube.");
+	}
 }
 
 if ($acodec_only == "") {
