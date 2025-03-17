@@ -23,8 +23,10 @@ $ytdl_binary = "yt-dlp";
 $ytdl_format = "best";
 // Target video bitrate (in ffmpeg format, M for megabit, k for kilobit, no suffix for bits)
 $bitrate = "15M";
-// Target audio bitrate
+// Target audio bitrate for video
 $abitrate = "192k";
+// Target audio bitrate for audio only mode (set to "" if same as abitrate)
+$abitrate_only = "";
 // Target width (in ffmpeg format, -1 for 'keep aspect ratio')
 $width = "-1";
 // Target height (in ffmpeg format, -1 for 'keep aspect ratio'). The default here resizes the video to 480 height, keeping the width in proportion.
@@ -33,6 +35,8 @@ $height = "480";
 $codec = "mpeg2video";
 // Target audio codec (I suggest mp2 if using mpeg2video and mpegts container.)
 $acodec = "mp2";
+// Target audio codec for audio only mode (set to "" if same as acodec)
+$acodec_only = "mp3";
 // Target video container (mpegts works well for streaming!).
 $container = "mpegts";
 // Target audio container for audio only mode (mp3 suggested for compatibility.)
@@ -120,11 +124,19 @@ if (!$valid) {
 	doError("Failed validation: ID " . $youtube_id . " format valid, but does not appear to exist on YouTube.");
 }
 
+if ($acodec_only == "") {
+	$acodec_only = $acodec;
+}
+
+if ($abitrate_only == "") {
+	$abitrate_only = $abitrate;
+}
+
 // Check the mode flag, and output video or audio as requested.
 if ($audio_mode == True) {
 	header('Content-Type: ' . $audio_mime);
 	$ytdlline = $ytdl_binary . " -4 -f " . $ytdl_format . " " . $escaped_youtube_id . " -o -";
-	$ffmpegline = $ffmpeg_binary . " -i - -vn -acodec " . $acodec . " -b:a " . $abitrate . " -f " . $audio_container . " - ";
+	$ffmpegline = $ffmpeg_binary . " -i - -vn -acodec " . $acodec_only . " -b:a " . $abitrate_only . " -f " . $audio_container . " - ";
 } else {
 	header('Content-Type: ' . $video_mime);
 	$ytdlline = $ytdl_binary . " -4 -f " . $ytdl_format . " " . $escaped_youtube_id . " -o -";
