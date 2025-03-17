@@ -109,9 +109,10 @@ if (isset($_GET['aonly'])) {
 	} else {
 		$audio_mode = False;
 	}
+} else {
+	$audio_mode = False;
 }
 
-$escaped_youtube_id = escapeshellarg($youtube_id);
 
 // Prototype playlist code, does not currently validate playlist exists
 if (isset($_GET['list'])) {
@@ -132,6 +133,7 @@ if ($playlist_mode == False) { // Only check validity of id if not in playlist m
 	if (!$valid) {
 		doError("Failed validation: ID " . $youtube_id . " format valid, but does not appear to exist on YouTube.");
 	}
+	$escaped_youtube_id = escapeshellarg($youtube_id);
 }
 
 if ($acodec_only == "") {
