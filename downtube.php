@@ -124,6 +124,14 @@ if (!$valid) {
 	doError("Failed validation: ID " . $youtube_id . " format valid, but does not appear to exist on YouTube.");
 }
 
+// Prototype playlist code, does not currently validate playlist exists
+if (isset($_GET['list']) {
+	$playlist_mode = True;
+	$list = escapeshellargs($_GET['list']);
+} else {
+	$playlist_mode = False;
+}
+
 if ($acodec_only == "") {
 	$acodec_only = $acodec;
 }
@@ -135,12 +143,17 @@ if ($abitrate_only == "") {
 // Check the mode flag, and output video or audio as requested.
 if ($audio_mode == True) {
 	header('Content-Type: ' . $audio_mime);
-	$ytdlline = $ytdl_binary . " -4 -f " . $ytdl_format . " " . $escaped_youtube_id . " -o -";
 	$ffmpegline = $ffmpeg_binary . " -i - -vn -acodec " . $acodec_only . " -b:a " . $abitrate_only . " -f " . $audio_container . " - ";
 } else {
 	header('Content-Type: ' . $video_mime);
-	$ytdlline = $ytdl_binary . " -4 -f " . $ytdl_format . " " . $escaped_youtube_id . " -o -";
 	$ffmpegline = $ffmpeg_binary . " -i - -vf scale=" . $width . ":" . $height . " -vcodec " . $codec . " -acodec " . $acodec . " -b:v " . $bitrate . " -b:a " . $abitrate . " -muxrate " . $bitrate . " -f " . $container . " - ";
+}
+
+// Prototype playlist code
+if ($playlist_mode == False) {
+	$ytdlline = $ytdl_binary . " -4 -f " . $ytdl_format . " " . $escaped_youtube_id . " -o -";
+} else {
+	$ytdlline = $ytdl_binary . " -4 -f " . $ytdl_format . " https://youtube.com/playlist?list=" . $list . " --yes-playlist --concat-playlist=always -o pl_video:-";
 }
 
 if ($debugmode == True) {
