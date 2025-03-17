@@ -32,6 +32,9 @@ http://yourwebserverhere/watch?v=1aVHll5egRY
 which, if you have a DNS redirection/hosts file redirect/some other way to turn "youtube.com" into "yourwebserverhere" would allow you to *seamlessly* click youtube links and watch them in MPEG2!
 
 
+**NEW:** There is now an audio only mode, intended for use with audio players like Winamp. MP3 (codec and container) is suggested for Pentium or better machines, MP2 for a 486. Add &aonly=yes to the URL to enable this, check the script for how to configure it.
+
+**NEW:** There is now a debug mode. Enable writing by the webserver to the directory DownTube is running in, and set $debugmode to True in the PHP file. This will create a pair of log files that will allow you to debug yt-dlp/ffmpeg issues.
 
 That's really all I have to say. Feel free to report bugs, ask me questions, fork this project, make pull requests, whatever. I don't guarantee a response. :P
 
