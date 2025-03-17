@@ -116,7 +116,7 @@ $escaped_youtube_id = escapeshellarg($youtube_id);
 // Prototype playlist code, does not currently validate playlist exists
 if (isset($_GET['list'])) {
 	$playlist_mode = True;
-	$list = escapeshellargs($_GET['list']);
+	$list = escapeshellarg($_GET['list']);
 } else {
 	$playlist_mode = False;
 }
