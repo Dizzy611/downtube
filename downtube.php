@@ -33,8 +33,15 @@ $height = "480";
 $codec = "mpeg2video";
 // Target audio codec (I suggest mp2 if using mpeg2video and mpegts container.)
 $acodec = "mp2";
-// Target container (mpegts works well for streaming!)
+// Target video container (mpegts works well for streaming!).
 $container = "mpegts";
+// Target audio container for audio only mode (mp3 suggested for compatibility.)
+$audio_container = "mp3";
+// MIME type for video. Set to "video/mpeg" for MPEGTS containers.
+$video_mime = "video/mpeg";
+// MIME type for audio. Set to "audio/mpeg" for MP3.
+$audio_mime = "audio/mpeg";
+
 // Do "redirect hack" to enable using as a direct substitute for YouTube via
 // DNS redirection/URL rewrite. (see accompanying htaccess file for rewrite rule)
 $redirecthack = True;
@@ -89,6 +96,15 @@ if ($redirecthack == True) {
 	$youtube_id = $_GET['id'];
 }
 
+// Set a variable to detect if we're in video mode (default) or audio only mode.
+if (isset($_GET['aonly'])) {
+	if ($_GET['aonly'] == "yes") {
+		$audio_mode = True;
+	} else {
+		$audio_mode = False;
+	}
+}
+
 $escaped_youtube_id = escapeshellarg($youtube_id);
 
 $valid = False;
@@ -102,9 +118,17 @@ if (!$valid) {
 	doError("Failed validation: ID " . $youtube_id . " format valid, but does not appear to exist on YouTube.");
 }
 
-header('Content-Type: video/mpeg');
-$ytdlline = $ytdl_binary . " -4 -f " . $ytdl_format . " " . $escaped_youtube_id . " -o -";
-$ffmpegline = $ffmpeg_binary . " -i - -vf scale=" . $width . ":" . $height . " -vcodec " . $codec . " -acodec " . $acodec . " -b:v " . $bitrate . " -b:a " . $abitrate . " -muxrate " . $bitrate . " -f " . $container . " - ";
+// Check the mode flag, and output video or audio as requested.
+if ($audio_mode == True) {
+	header('Content-Type: ' . $audio_mime);
+	$ytdlline = $ytdl_binary . " -4 -f " . $ytdl_format . " " . $escaped_youtube_id . " -o -";
+	$ffmpegline = $ffmpeg_binary . " -i - -vn -acodec " . $acodec . " -b:a " . $abitrate . " -f " . $audio_container . " - ";
+} else {
+	header('Content-Type: ' . $video_mime);
+	$ytdlline = $ytdl_binary . " -4 -f " . $ytdl_format . " " . $escaped_youtube_id . " -o -";
+	$ffmpegline = $ffmpeg_binary . " -i - -vf scale=" . $width . ":" . $height . " -vcodec " . $codec . " -acodec " . $acodec . " -b:v " . $bitrate . " -b:a " . $abitrate . " -muxrate " . $bitrate . " -f " . $container . " - ";
+}
+
 passthru($ytdlline . " | " . $ffmpegline);
 
 ?>
