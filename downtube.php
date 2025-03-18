@@ -71,7 +71,7 @@ function videoExists($id) { // Check if previously validated video exists on you
 } // Adapted from stackoverflow question 29166402
 
 function doError($errortext) { // Handle fatal errors cleanly in a consistent format.
-	header("HTTP/1.0 404 Not Found");
+	header("HTTP/1.0 500 Internal Server Error");
 	// hack: DON'T CACHE OUR FUCKING ERRORS, credit to stackoverflow question 1907653
 	header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 	header("Cache-Control: no-store, no-cache, must-revalidate"); // HTTP/1.1
